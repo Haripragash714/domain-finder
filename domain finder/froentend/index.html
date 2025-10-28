@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DomainFinder - Find Your Perfect Domain Name</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-slate: #1e293b;
+            --tech-blue: #0ea5e9;
+            --cloud-white: #f8fafc;
+            --success-green: #10b981;
+            --warning-amber: #f59e0b;
+            --error-red: #ef4444;
+            --neutral-gray: #64748b;
+            --light-blue: #e0f2fe;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .domain-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(rgba(30, 41, 59, 0.7), rgba(30, 41, 59, 0.7)), url('resources/hero-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .glass-nav {
+            background: rgba(248, 250, 252, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .domain-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .domain-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            border-color: var(--tech-blue);
+        }
+        
+        .available { border-left: 4px solid var(--success-green); }
+        .taken { border-left: 4px solid var(--error-red); }
+        .premium { border-left: 4px solid var(--warning-amber); }
+        
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .particle-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--tech-blue), var(--success-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stats-counter {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--tech-blue);
+        }
+        
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--tech-blue), var(--success-green));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">D</span>
+                    </div>
+                    <span class="text-2xl font-bold text-slate-800">DomainFinder</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-slate-700 hover:text-blue-500 font-medium transition-colors">Search</a>
+                    
+                </div>
+                
+                <button class="md:hidden p-2" id="mobile-menu-btn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center justify-center pt-20">
+        <div class="particle-bg" id="particle-canvas"></div>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-12">
+                <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                    Find Your Perfect
+                    <span class="gradient-text block" data-splitting>Domain Name</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+                    Search, discover, and secure the ideal domain name for your business with our advanced domain finder platform. Real-time availability, AI-powered suggestions, and comprehensive domain management.
+                </p>
+            </div>
+            
+            <!-- Search Interface -->
+            <div class="search-card rounded-2xl p-8 max-w-4xl mx-auto mb-12">
+                <div class="flex flex-col lg:flex-row gap-4 mb-6">
+                    <div class="flex-1">
+                        <input 
+                            type="text" 
+                            id="domain-search"
+                            placeholder="Enter your desired domain name"
+                            class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors domain-font"
+                        >
+                    </div>
+                    <div class="lg:w-48">
+                        <select id="domain-extension" class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors">
+                            <option value=".com">.com</option>
+                            <option value=".net">.net</option>
+                            <option value=".org">.org</option>
+                            <option value=".io">.io</option>
+                            <option value=".ai">.ai</option>
+                            <option value=".dev">.dev</option>
+                            <option value=".app">.app</option>
+                            <option value=".co">.co</option>
+                        </select>
+                    </div>
+                    <button 
+                        id="search-btn"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold transition-all transform hover:scale-105 flex items-center justify-center"
+                    >
+                        <span id="search-text">Search Domain</span>
+                        <svg id="search-spinner" class="hidden w-5 h-5 ml-2 loading-spinner" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Quick Suggestions -->
+                <div class="flex flex-wrap gap-2 justify-center">
+                    <span class="text-sm text-gray-600 mr-2">Popular searches:</span>
+                    <button class="suggestion-btn px-3 py-1 bg-gray-100 hover:bg-blue-100 text-sm rounded-full transition-colors" data-domain="mybusiness">mybusiness</button>
+                    <button class="suggestion-btn px-3 py-1 bg-gray-100 hover:bg-blue-100 text-sm rounded-full transition-colors" data-domain="techstartup">techstartup</button>
+                    <button class="suggestion-btn px-3 py-1 bg-gray-100 hover:bg-blue-100 text-sm rounded-full transition-colors" data-domain="onlinestore">onlinestore</button>
+                    <button class="suggestion-btn px-3 py-1 bg-gray-100 hover:bg-blue-100 text-sm rounded-full transition-colors" data-domain="personalblog">personalblog</button>
+                </div>
+            </div>
+            
+            <!-- Search Results -->
+            <div id="search-results" class="hidden max-w-4xl mx-auto">
+                <div class="bg-white rounded-2xl p-8 shadow-lg">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-6">Search Results</h3>
+                    <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   
+
+   
+
+    
+    <script src="main.js"></script>
+</body>
+</html>
