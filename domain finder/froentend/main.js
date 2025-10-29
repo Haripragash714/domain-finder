@@ -3,7 +3,7 @@
 
 class DomainFinder {
     constructor() {
-        this.apiBaseUrl = 'http://127.0.0.1:5000';
+        this.apiBaseUrl = 'https://domain-finder-backend-szpe.onrender.com';
         this.searchHistory = JSON.parse(localStorage.getItem('searchHistory') || '[]');
         this.favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
         this.cart = JSON.parse(localStorage.getItem('cart') || '[]');
