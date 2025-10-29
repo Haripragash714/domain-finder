@@ -1,2 +1,4 @@
 flask
 python-whois
+flask-cors
+
